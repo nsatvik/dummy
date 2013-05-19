@@ -1,0 +1,58 @@
+Problem Statement: 
+-----------------
+You are given a list of web search queries, one in every line. Every query has exactly one location name. Your task is to identify the location name. To help you out, we will provide a list of location names which will include all the location names present in the input queries. However, when real users type in a query, they often make spelling mistakes (e.g., "Cijapur" instead of "Bijapur") or may not know the correct spelling of the location and therefore, type something which sounds similar (e.g., "Chitrakut" instead of "Chitrakoot"). Therefore, your task is not only to identify the location word but to replace it with the correct spelling from the list of locations whenever it is incorrect.
+
+Here are some examples:
+
+Suppose the "List of Locations" contains:    
+Amritsar, Bharatpur, Chitrakoot, Gorakhpur, Kolkata
+
+Input queries are:
+
+computer dealers in bharatpur
+reliance mall in chitrakut
+how 2 go to amitsar
+tourist places near gorakpur
+victoria memorial kolkata 
+
+
+The expected output is:
+
+computer dealers in <loc>bharatpur</loc>
+reliance mall in <loc>chitrakoot</loc>
+how 2 go to <loc>amritsar</loc>
+tourist places near <loc>gorakhpur</loc>
+victoria memorial <loc>kolkata</loc> 
+
+Thus, you need to mark every location word by a <loc> and </loc> label. Please note that there should not be any space between or after the location word. I.e., <loc>kolkata</loc> is correct, but <loc> kolkata</loc> is wrong.
+
+Check the attached sample input and output files and location list to familiarize yourself with the exact i/o formats.
+
+
+Notes:
+------
+1. You may assume that the number of locations in the location list is not more than 1000. But the number of queries in the input file can be very large.
+
+2. Location names occuring as a part of another name does not count as a location. For example "Delhi" should not be considered as a location in the query "free download delhi belly mpeg".
+
+3. If due to some typographical error, it is not clear what the intended location name was, for example "Cijapur" (see the sample i/o files), try to identify the most probable intended location based on the kind of errors people do while typing. For instance, "Cijapur" is more likely to be "vijapur" and not "bijapur". Can you guess why? Sometimes, albeit very rarely, multiple answers might be correct, in which case we will accept all the valid answers.
+
+Submission Guidelines:
+----------------------
+1. We will send you (through email) the actual input file on 22nd May, before 12:00 noon. 
+
+2. What to submit?
+	- The output file: Run your program on the input file. Send us the generated output file (should not be tempered manually) as a .txt file (preferred o/p format is .txt, but in case your net connection is slow, you can submit the zipped version of the .txt file). 
+	- The code: Submit the code, along with a clearly written Readme file with instructions on how to run, all zipped together. If you use some extra resources, such a dictionary or rule file, do not forget to include the resources in your zipped file. But please note that the zipped folder should not exceed 1MB.
+
+3. How to Submit?
+	- Log into the submission website: https://cmt.research.microsoft.com/PREFIRE
+	- You can access your registration page by using your id/password that you had used during registration.
+	- Once you reach there, you can edit your registration information - under which you will see options for (a) uploading the paper, and (b) uploading supplementary material.
+	- Please upload your output file using the "paper upload" link.
+	- Please upload your zipped code folder using the "supplementary material upload" link.
+
+4. Submission Deadline - 22nd May, 8 pm Indian Std Time. 
+
+And you should be done! 
+In case you have any questions regarding submission process, please write to monojitc@microsoft.com and parth.mehta126@gmail.com (both the ids). Questions regarding the problem statement are not encouraged, but if you believe that your question is really important you can send us an email (same ids). A response is not guaranteed.  
