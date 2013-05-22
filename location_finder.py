@@ -20,7 +20,7 @@ class search_query:
 			if word in list_of_words:
 				continue
 			self.locations.append((i,word))
-		#print self.locations
+		print self.locations
 		
 	
 	def correct_location(self,list_of_locations,hashmap,keys):
@@ -76,6 +76,15 @@ class search_query:
 						max_prob_loc = prob_location
 					pass
 					#Measure the distance of this word Correction Algo goes here!
+				edit_distances = []
+				min = 10000 #a large value
+				edit_dist_loc = ''
+				for loc in probable_locations:
+					edit_distances.append(levenshtein(self.locations[0][1], loc))
+					if edit_distances[-1]<min:
+						min = edit_distances[-1]
+						edit_dist_loc = loc
+				
 				self.corrected_location=(self.locations[0][0],max_prob_loc)
 				#print self.corrected_location
 				#Find maximum probability and minimum edits
@@ -83,9 +92,61 @@ class search_query:
 				
 				
 		else:
-			for location in self.locations:
-				if location[1] in list_of_locations:
+			global_probability = 0
+			global_most_probable = ''
+			index = -1
+			for i in range(len(self.locations)):
+				if self.locations[i][1] in list_of_locations:
+					if self.check_neighbouring_words(i):
+						pass #That's all, try updating the hashmap
+				location_keys = self.get_location_keys(self.locations[i][1],keys)
+				freq_table = {}
+				for key in location_keys:
+					loc = ''
+					try:
+						locs = hashmap[key]
+						for loc in locs:
+							try:
+								freq_table[loc] += 1
+							except KeyError:
+								#print 'caught '
+								freq_table[loc] = 1
+					except KeyError:
+						#print 'Key Error if 1'
+						pass
+					except ValueError:
+						#print 'Value Error if 1'
+						pass #Key not in the hashmap.. Figure a way out
+				
+				total = 0
+				for value in freq_table.values():
+						total += value
+				for key in freq_table.keys():
+					try:
+						freq_table[key] = float(freq_table[key])/float(total)
+						if freq_table[key]==1: #Can set a threshold here
+							if self.check_neighbouring_words(i):
+								self.update_surrounding_words(i)
+							#return
+					except ZeroDivisionError:
+						pass 
+				#print freq_table
+				probable_locations = freq_table.keys() #Need to sort with descending order of probability
+				max_prob = 0
+				max_prob_loc = 'TBD'
+				#print self.locations[i][1],' -> ',probable_locations
+				print freq_table
+				for prob_location in probable_locations:
+					if freq_table[prob_location] > max_prob:
+						max_prob = freq_table[prob_location]
+						max_prob_loc = prob_location
 					pass
+					#Measure the distance of this word Correction Algo goes here!
+				if max_prob > global_probability:
+					global_probability = max_prob
+					global_most_probable = max_prob_loc
+					index = i
+			self.corrected_location=(self.locations[index][0],global_most_probable)	
 		
 		#With these keys find a probable list of locations
 		#If more than 1 locations are mapped use edit-distance or someother spell check and map it to the closest algo :D
@@ -98,16 +159,32 @@ class search_query:
 			else:
 				k.append(location[key[0]:key[1]])
 		return k
-				
+	def check_neighbouring_words(self, index):
+		loc = self.locations[index][0]
+		pos = 0
+		n = len(self.words)
+		if loc < (n-1):
+			try :
+				if search_query.suceeding_words[self.words[loc+1]]:
+					pos += 1
+			except KeyError:
+				pass
+		if loc > 1:
+			try:
+				if search_query.preceeding_words[self.words[loc-1]]:
+					pos += 1
+			except KeyError:
+				pass
+		return pos
 	def update_surrounding_words(self, index):
 		n = len(self.words)
 		#print 'Index = ',index,' n = ', n,'len(self.locations) = ',len(self.locations)
-		if self.locations[0][0] < (n-1):
+		if self.locations[index][0] < (n-1):
 			try:
 				search_query.suceeding_words[self.words[self.locations[index][0]+1]] += 1
 			except KeyError:
 				search_query.suceeding_words[self.words[self.locations[index][0]+1]] = 1
-		if self.locations[0][0] > 1:
+		if self.locations[index][0] > 1:
 			try:
 				search_query.preceeding_words[(self.words[self.locations[index][0]-1])] += 1
 			except KeyError:
@@ -119,12 +196,27 @@ class search_query:
 			if len(output)>0:
 				output += ' '
 			if i==self.corrected_location[0]:				
-				output += '<loc>'+self.corrected_location[1]+'</loc>'
+				output += '<loc>'+str(self.corrected_location[1])+'</loc>'
 			else:
 				output += self.words[i]
 		return output	
 			
-				
+def levenshtein(s1, s2):
+	if len(s1)<len(s2):
+		return levenshtein(s2, s1)
+	
+	if len(s2)==0:
+		return len(s1)
+	previous_row = xrange(len(s2)+1)
+	for i,c1 in enumerate(s1):
+		current_row = [i+1]
+		for j,c2 in enumerate(s2):
+			insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
+			deletions = current_row[j] + 1       # than s
+			substitutions = previous_row[j] + (c1 != c2)
+			current_row.append(min(insertions, deletions, substitutions))
+			previous_row = current_row
+	return previous_row[-1]
 		
 def initSearchQueries(query_file_name):
 	lines = []
@@ -186,7 +278,7 @@ def main():
 		query.findProbableLocations(list_of_words)
 		query.correct_location(list_of_locations,hashmap,keys)
 		print query.toString()
-
+	
 
 
 if __name__=='__main__':
