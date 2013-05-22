@@ -1,0 +1,18 @@
+Team Name : Infinite Loop
+Members : Mrs. Shambhavi B.R, Atanu Ghosh, Satvik N.
+
+Readme file to run the program
+
+The zip folder Location_Finder.zip contains all the resource and source files. This project is developed in python.
+
+The resource files are 
+(1) list_of_words.txt - This file contains the list of all english words.
+(2) Misc : Other miscellaneous files required to run the program like sample_input.txt, final_queries.txt, Location.txt etc.
+
+
+To run the program 
+(1) Unzip the file Location_Finder.zip and change the current working directory to Location_Finder.
+	$cd Location_Finder
+(2) location_finder.py is the main source file and the program accepts command line arguments.
+	$python location_finder.py query_file_name locations_file_name output_file_name
+(3) The program writes the output to the output_file_name specified above.
