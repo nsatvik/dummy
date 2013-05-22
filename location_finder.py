@@ -182,7 +182,7 @@ class search_query:
 			if edit_dist <= 3 :
 				self.corrected_location=(self.locations[edit_dist_index][0],edit_dist_loc)
 			elif index == edit_dist_index:
-				self.corrected_location=(self.locations[index][0],global_most_probable)
+				self.corrected_location=(self.locations[index][0],global_most_probable)				
 			else:
 				self.corrected_location=(self.locations[index][0],global_most_probable)
 					
@@ -298,8 +298,8 @@ def build_location_hashmap(list_of_locations, keys):
 					map[location[key[0]:key[1]]] = {location}		
 	return map
 def main():
-	if (len(sys.argv) < 3):
-		print 'Usage python location_finder.py query_file_name locations_file_name'
+	if (len(sys.argv) < 4):
+		print 'Usage python location_finder.py query_file_name locations_file_name output_file_name'
 		exit()
 	
 
@@ -310,14 +310,16 @@ def main():
 	list_of_words = set(file_reader('list_of_words')) - locations
 	keys=[(0,2),(0,3),(-3,-1),(-4,-1),(-2,-1)]
 	hashmap = build_location_hashmap(list_of_locations,keys)
+	print 'Processing....'
 	
-	
-	
+	f = open(sys.argv[3],'w')
 	for query in queries:
 		query.findProbableLocations(list_of_words)
 		query.correct_location(list_of_locations,hashmap,keys)
-		print query.toString()
-	
+		#print query.toString()
+		f.write(query.toString()+"\n")
+	f.close()
+	print 'Output written to ',sys.argv[3]
 
 
 if __name__=='__main__':
