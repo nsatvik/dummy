@@ -7,11 +7,13 @@ class search_query:
 	locations = []
 	corrected_location = (0,'') #Index and spelling of the correct location.
 	def __init__(self, query):
+		print 'Constructor '
 		self.words = query.split(' ')
 		self.locations = []
 		self.corrected_location = (0,'Correct Spelling of the location')
 		search_query.preceeding_words = {}
 		search_query.succeeding_words = {}
+		print self.words
 	
 	def findProbableLocations(self,list_of_words):
 		for i in range(len(self.words)):
@@ -20,7 +22,7 @@ class search_query:
 			if word in list_of_words:
 				continue
 			self.locations.append((i,word))
-		#print self.locations
+		print self.locations
 		
 	
 	def correct_location(self,list_of_locations,hashmap,keys):
@@ -31,11 +33,13 @@ class search_query:
 		l = len(self.locations)
 		n = len(self.words)
 		if l==1:
-			if self.locations[0][1] in list_of_locations: #Can be changed to Probability Model 
+			if self.locations[0][1] in list_of_locations: #Can be changed to Probability Model
+				print 'len === 1 and inside if' 
 				self.update_surrounding_words(0)
 				self.corrected_location = (self.locations[0][0],self.locations[0][1])
 				return
 			else:
+				print 'len == 1 else part'
 				location_keys = self.get_location_keys(self.locations[0][1],keys)
 				freq_table = {}
 				for key in location_keys:
@@ -66,9 +70,9 @@ class search_query:
 							#return
 					except ZeroDivisionError:
 						pass 
-				#print freq_table
+				print freq_table
 				probable_locations = freq_table.keys() #Need to sort with descending order of probability
-				#print 'Length of Suggesstions = ',len(probable_locations)
+				print 'Length of Suggesstions = ',len(probable_locations)
 				if len(probable_locations)==1:
 					self.corrected_location=(self.locations[0][0],probable_locations[0])
 					return
@@ -82,14 +86,17 @@ class search_query:
 					#Measure the distance of this word Correction Algo goes here!
 				edit_distances = []
 				min = sys.maxint
-				edit_dist_loc = ''
+				edit_dist_loc = 'Edit_Loc_TBD'
 				for loc in probable_locations:
 					edit_distances.append(levenshtein(self.locations[0][1], loc))
 					if edit_distances[-1]<min:
 						min = edit_distances[-1]
 						edit_dist_loc = loc
 				
-				self.corrected_location=(self.locations[0][0],max_prob_loc)
+				if min <= 3:
+					self.corrected_location = (self.locations[0][0],edit_dist_loc)
+				else:
+					self.corrected_location=(self.locations[0][0],max_prob_loc)
 				#print self.corrected_location
 				#Find maximum probability and minimum edits
 				#set the current location to that.
@@ -143,8 +150,8 @@ class search_query:
 						pass 
 				#print freq_table
 				probable_locations = freq_table.keys() #Need to sort with descending order of probability
-				max_prob = 0
-				max_prob_loc = 'TBD'
+				max_prob = -1
+				max_prob_loc = ''
 				nums = len(probable_locations)
 				if nums == 0:
 					#print 'location discarded ', self.locations[i][1]
@@ -155,6 +162,7 @@ class search_query:
 					if edistance < edit_dist:
 						edit_dist = edistance
 						edit_dist_loc = self.locations[i][1]
+						max_prob_loc = edit_dist_loc
 						edit_dist_index = i
 						continue
 				
@@ -236,6 +244,8 @@ class search_query:
 				output += ' '
 			if i==self.corrected_location[0]:				
 				output += '<loc>'+str(self.corrected_location[1])+'</loc>'
+				if len(self.corrected_location[1])==0:
+					print 'Anomaly Detected = ', self.words, " Locations = ", self.locations
 			else:
 				output += self.words[i]
 		return output	
@@ -311,12 +321,12 @@ def main():
 	keys=[(0,2),(0,3),(-3,-1),(-4,-1),(-2,-1)]
 	hashmap = build_location_hashmap(list_of_locations,keys)
 	print 'Processing....'
-	
+	print 'Please Wait...'
 	f = open(sys.argv[3],'w')
 	for query in queries:
 		query.findProbableLocations(list_of_words)
 		query.correct_location(list_of_locations,hashmap,keys)
-		#print query.toString()
+		print query.toString()
 		f.write(query.toString()+"\n")
 	f.close()
 	print 'Output written to ',sys.argv[3]
